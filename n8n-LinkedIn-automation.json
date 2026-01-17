@@ -1,0 +1,1529 @@
+{
+  "name": "n8n-LinkedIn-automation",
+  "nodes": [
+    {
+      "parameters": {
+        "maxItems": 17
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        496,
+        48
+      ],
+      "id": "54416045-d7ee-494c-bf06-f1457a70c446",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "content": "We used a manual trigger for this workflow. In production, we, use scheduled Trigger node",
+        "height": 176,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -48
+      ],
+      "id": "e4cc7f5a-dc99-4a80-917a-70c3fd413dea",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        32
+      ],
+      "id": "e7fabd76-0fe6-4770-a788-b595bd6ef37e",
+      "name": "manual"
+    },
+    {
+      "parameters": {
+        "content": "This node does the heavy lifting. we use http request to automate pulling leads using apify actor. provide your own apify  token, actor ID to get leads list. Also, modify the body json to fetch leads according to filters you define therein",
+        "height": 176,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -48
+      ],
+      "id": "e3c99fb7-9b03-4508-ad39-320a3fbfff52",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https.",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"companyEmployeeSizeIncludes\": [\n        \"1-10\"\n    ],\n    \"companyIndustryIncludes\": [\n        \"Computer Software\"\n    ],\n    \"emailStatus\": \"verified\",\n    \"hasEmail\": true,\n    \"hasPhone\": false,\n    \"includeSimilarTitles\": false,\n    \"personLocationCountryIncludes\": [\n        \"Kenya\",\n        \"India\"\n    ],\n    \"personTitleIncludes\": [\n        \"Data Analyst\",\n        \"Data Scientist\",\n        \"IT Specialist\",\n        \"IT Manager\",\n        \"Accountant\"\n    ],\n    \"resetSavedProgress\": false,\n    \"totalResults\": 50\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        256,
+        32
+      ],
+      "id": "00759839-0264-411b-87eb-2feeb5d317df",
+      "name": "Get Leads"
+    },
+    {
+      "parameters": {
+        "content": "This node does limit the number of leads for quick iteration and testing",
+        "width": 176,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -32
+      ],
+      "id": "3be37f4f-04c7-4876-b38a-36712cad840e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Please write a LinkedIn connection request for this person:\n\nName: {{ $json.firstName }}\nPosition: {{ $json.position }}\nCompany: {{ $json.orgName }}\nCompany Description: {{ $json.orgDescription }}\n\nFollow this structure:\n\"Hi {{ $json.firstName }}, [One personalized sentence about their work at {{ $json.orgName }} or their role as a {{ $json.position }}]. I'd love to connect and follow your journey. Cheers!\""
+            },
+            {
+              "role": "system",
+              "content": "You are a professional networking expert. Your task is to write a short, personalized LinkedIn connection request (under 300 characters). \n- Use a friendly but professional tone.\n- Mention their specific role or their company's mission to show you've done your research.\n- Do not be \"salesy.\" Focus on connecting and learning.\n- IMPORTANT: The entire message must be under 280 characters to ensure it fits in a LinkedIn invitation."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        704,
+        48
+      ],
+      "id": "76c44933-c0e1-43c8-82de-57b10dce7472",
+      "name": "create personalized messages",
+      "credentials": {
+        "openAiApi": {
+          "id": "0POol7EJUVWrnmTt",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "we used this AI model to generate personalized messages for each individual lead to send as the connection message. NOTE: the message should be short",
+        "height": 208,
+        "width": 304,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -64
+      ],
+      "id": "eed375e4-74eb-4e15-b0d5-95287414c1f7",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "This node does use the google sheets api to log the leads and the custom messages into google sheets. The results? a well structured dataset. ",
+        "height": 208,
+        "width": 272,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        -80
+      ],
+      "id": "ea19f8f4-86de-4ec6-8d69-7ca772c72449",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "Finally, we used PhantomBuster api to send connection requests to linkedin . In the input json, we passed the google sheets url that contains our dataset, we then explicitly pointed the columns with the linked url and the message to pass. Provide your own PhantomBuster api key, Phatom ID from the UI. make sure the sheets url is accessible to everybody .",
+        "height": 240,
+        "width": 352,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        -128
+      ],
+      "id": "8458a4a4-cdd7-4ee8-9b82-893cae5a8bc4",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "This workflow automates linkedin connection requests using apify actor to fetch leads, AI model to draft personalized meassages and PhantomBuster  api to safely send connection requests. This can be done at scale. Furthermore, Phantoms can do a wide range of linkedin automations like messaging leads and follow-ups, leads engagement. All you need is the phantom ID or name ",
+        "height": 80,
+        "width": 976,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -192
+      ],
+      "id": "f137d6eb-29f3-4b8c-abb3-56e1f598cfc5",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "agentId": "9001297643776384",
+        "jsonParameters": true,
+        "additionalFields": {
+          "argumentsJson": "{\n\t\"numberOfAddsPerLaunch\": 10,\n\t\"onlySecondCircle\": false,\n\t\"dwellTime\": true,\n\t\"inputType\": \"spreadsheetUrl\",\n\t\"spreadsheetUrl\": \"https://docs.google.com/spreadsheets/d/1cXTV3-hM1xX2zPZ_RBF21hJXdoXocd5Di_dKXFuUeok/edit?gid=462413560#gid=462413560\",\n\t\"spreadsheetUrlExclusionList\": [],\n\t\"sessionCookie\": \"{{linkedin cookies}}\",\n\t\"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0\",\n    \"columnName\": \"LinkedIn url\",\n\t\"messageColumn\": \"Message\"\n}"
+        }
+      },
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        32
+      ],
+      "id": "ba279c0e-e1d4-4dac-ac68-85f8afe9635a",
+      "name": "Send connection request",
+      "credentials": {
+        "phantombusterApi": {
+          "id": "APl0yBItTzsFPFru",
+          "name": "Phantombuster account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1cXTV3-hM1xX2zPZ_RBF21hJXdoXocd5Di_dKXFuUeok",
+          "mode": "list",
+          "cachedResultName": "vapi_agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cXTV3-hM1xX2zPZ_RBF21hJXdoXocd5Di_dKXFuUeok/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 462413560,
+          "mode": "list",
+          "cachedResultName": "Sheet5",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cXTV3-hM1xX2zPZ_RBF21hJXdoXocd5Di_dKXFuUeok/edit#gid=462413560"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $('Limit').item.json.fullName }}",
+            "Message": "={{ $json.output[0].content[0].text }}"
+          },
+          "matchingColumns": [
+            "Full Name"
+          ],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn url",
+              "displayName": "LinkedIn url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Seniority",
+              "displayName": "Seniority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1072,
+        32
+      ],
+      "id": "1bbbefda-5d8b-42ec-8a7f-f168308ab73d",
+      "name": "Add dataset to Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bdvU9wuapJDK4Dxl",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Get Leads": [
+      {
+        "json": {
+          "city": "Bengaluru",
+          "country": "India",
+          "email": "smithapowlay@systechsoftwares.com",
+          "firstName": "Smitha",
+          "fullName": "Smitha Powlay",
+          "functional": "['accounting']",
+          "lastName": "Powlay",
+          "linkedinUrl": "http://www.linkedin.com/in/smitha-d-powlay-6a379453",
+          "orgCity": "",
+          "orgCountry": "",
+          "orgDescription": "19 year old Software Marketing / Support company based out of Bangalore, INDIA.\\\\Product Division: Tds, Payroll, FAMS (Fixed Asset Management Software), Tally (Sales, Support, Customization, Training), Digital Signature Certificate (DSC).\\Outsourcing Division : eTds Conversions.\\TinFc Division : PAN, TAN, eTds, 26AS",
+          "orgFoundedYear": "1995",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/845875']",
+          "orgName": "SYSTECH Softwares Pvt. Ltd.",
+          "orgSize": "10",
+          "orgState": "",
+          "orgWebsite": "http://www.systechsoftwares.com",
+          "phone": "",
+          "position": "Jr. Accountant",
+          "seniority": "entry",
+          "state": "Karnataka",
+          "ppeIndex": 17,
+          "ppeBatchIndex": 0
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "",
+          "country": "India",
+          "email": "kamal.biyabani@nbs-it.com",
+          "firstName": "Kamal",
+          "fullName": "Kamal Biyabani",
+          "functional": "['accounting']",
+          "lastName": "Biyabani",
+          "linkedinUrl": "http://www.linkedin.com/in/kamal-biyabani-96378430",
+          "orgCity": "",
+          "orgCountry": "United States",
+          "orgDescription": "Namtra is an IT services and software firm that specializes in providing high value solutions to our government, corporate and nonprofit clients by leveraging mature process and technology improvement techniques, innovative software, sub-contracting and IT talent augmentation. We are a woman owned SBA 8(a) firm with offices in Virginia, Florida and New Jersey. We have a successful 13-year track record of providing high value services and software to our clients. We are a Microsoft Gold Certified Partner and have achieved CMMI Level 2 certification, awarded by the Carnegie Mellon Software Engineering Institute, for mature development processes and adherence to very rigid personal management and recruitment policies and procedures.",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/1093149']",
+          "orgName": "Namtra Business Solutions",
+          "orgSize": "9",
+          "orgState": "",
+          "orgWebsite": "http://www.nbs-it.com",
+          "phone": "",
+          "position": "Accountant",
+          "seniority": "entry",
+          "state": "Telangana",
+          "ppeIndex": 18,
+          "ppeBatchIndex": 1
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "",
+          "country": "India",
+          "email": "jagruti.jiman@realtimeanalyticsplatform.com",
+          "firstName": "Jagruti",
+          "fullName": "Jagruti Jiman",
+          "functional": "['accounting']",
+          "lastName": "Jiman",
+          "linkedinUrl": "http://www.linkedin.com/in/jagruti-jiman-2486a964",
+          "orgCity": "Pleasanton",
+          "orgCountry": "United States",
+          "orgDescription": "We provide the framework and tools to connect data sources for analytics and visualization. Our platform gives you the freedom to choose components best suited for your needs and quickly build analytics applications that help you get maximum ROI on your investment and build your own IP using ours.\\\\We believe in our 'freedom to choose'​ philosophy that lets you evaluate all options from a stack of licensed or open source software products that meet your needs. We continuously test and benchmark the performance of our platform on different databases, analytics engines and visualization tools giving you the unique ability to leverage the power and simplicity of our Modeling, Analytics and Visualization features of our platform.",
+          "orgFoundedYear": "2014",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/4832452']",
+          "orgName": "Rtap.io",
+          "orgSize": "7",
+          "orgState": "California",
+          "orgWebsite": "http://www.rtap.io",
+          "phone": "",
+          "position": "Sr. Accountant",
+          "seniority": "senior",
+          "state": "",
+          "ppeIndex": 19,
+          "ppeBatchIndex": 2
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "",
+          "country": "Kenya",
+          "email": "faith@agritrace.co.ke",
+          "firstName": "Faith",
+          "fullName": "Faith Maritim",
+          "functional": "['accounting']",
+          "lastName": "Maritim",
+          "linkedinUrl": "http://www.linkedin.com/in/faith-maritim-08774146",
+          "orgCity": "",
+          "orgCountry": "",
+          "orgDescription": "",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/1390185']",
+          "orgName": "Agritrace Kenya ltd",
+          "orgSize": "9",
+          "orgState": "",
+          "orgWebsite": "http://www.agritrace.co.ke",
+          "phone": "",
+          "position": "ACCOUNTANT",
+          "seniority": "entry",
+          "state": "",
+          "ppeIndex": 20,
+          "ppeBatchIndex": 3
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "",
+          "country": "Kenya",
+          "email": "millicent@softlinkoptions.com",
+          "firstName": "Millicent",
+          "fullName": "Millicent Nyando",
+          "functional": "['accounting']",
+          "lastName": "Nyando",
+          "linkedinUrl": "http://www.linkedin.com/in/millicent-nyando-182416117",
+          "orgCity": "Nairobi",
+          "orgCountry": "Kenya",
+          "orgDescription": "At Softlink Options, we help companies like yours find the best web services for your business. We provide professional expert advice and skills to deliver web services that will ease and enhance your work allowing you to focus on your main business goals. Through continuous research, we endeavor to create web solutions that allow for sustainable to business. This way, you will always find a solution that is affordable to your Business Enterprise.\\\\We visualize a world with simple yet effective web solutions that demystify the complexities of the internet requiring long term training. Imagine HR software that is as simple to learn as Facebook or Twitter. Located at Westlands, Mvuli road, we have access to state-of-the-art infrastructure that enables us to undertake and accomplish projects of any volume and complexity within deadlines without compromising on quality.\\\\We have successfully completed a number of web projects with our clients including: individuals, small to medium sized companies, service providers and various non-governmental organizations in Kenya and the US. We strongly believe that web services will ease the constraints of time, cost, and space for discovering, negotiating, and conducting e-business transactions and we want to go through this journey together.\\\\Visit our website: www.softlinkoptions.com and talk to us, we'd love to hear from you.",
+          "orgFoundedYear": "2007",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/1527166']",
+          "orgName": "Softlink Options Limited",
+          "orgSize": "8",
+          "orgState": "",
+          "orgWebsite": "http://www.softlinkoptions.com",
+          "phone": "",
+          "position": "Accountant",
+          "seniority": "entry",
+          "state": "",
+          "ppeIndex": 21,
+          "ppeBatchIndex": 4
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Mumbai",
+          "country": "India",
+          "email": "vinod@cynapse.com",
+          "firstName": "Vinod",
+          "fullName": "Vinod Prajapati",
+          "functional": "['accounting']",
+          "lastName": "Prajapati",
+          "linkedinUrl": "http://www.linkedin.com/in/vinod-prajapati-5a541126",
+          "orgCity": "Mumbai",
+          "orgCountry": "India",
+          "orgDescription": "We create interfaces for your digital nervous system.\\\\Our prime directive is to invent technology that applies to and benefits everyday life. We believe in creating products that solve specific fundamental problems in the most beautiful and amazing way.\\\\Cynapse was founded in April 2001 in Mumbai.\\\\Cynapse has successfully produced 10 products in its lifespan, focused in the areas of productivity and collaboration.",
+          "orgFoundedYear": "2001",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/42024']",
+          "orgName": "Cynapse",
+          "orgSize": "8",
+          "orgState": "Maharashtra",
+          "orgWebsite": "http://www.cynapse.com",
+          "phone": "",
+          "position": "Accountant",
+          "seniority": "entry",
+          "state": "Maharashtra",
+          "ppeIndex": 22,
+          "ppeBatchIndex": 5
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "New Delhi",
+          "country": "India",
+          "email": "prajput@digital-dispatch.com",
+          "firstName": "Puneet",
+          "fullName": "Puneet Rajput",
+          "functional": "['accounting']",
+          "lastName": "Rajput",
+          "linkedinUrl": "http://www.linkedin.com/in/puneet-puneet-rajput-41216a37",
+          "orgCity": "",
+          "orgCountry": "Finland",
+          "orgDescription": "Mobisoft specializes in automated dispatching and wireless data transfer applications for passenger transport. Mobisoft was acquired by DDS Wireless International Inc. in late 2007 and its solutions are available in North America through DDS Wireless' subsidiaries, Digital Dispatch and StrataGen. Its managed dispatch service is offered as a part of Digital Dispatch's portfolio of taxi solutions and its transit solution complements StrataGen's demand response solution.\\\\We have over 15 years experience in automated dispatching and scheduling, GPS and digital map based routing and location systems etc., in a number of European countries. Our focus on real-time scheduling and dispatching for passenger transport allows us to provide complete systems to address all the needs of taxi companies, local authorities, bus companies – in fact any transport operator or provider.\\\\The combination of technical development and engineering skills along with many years real transport experience has enabled us to develop highly advanced IT solutions for passenger transport: the TaxiBook automatic booking and dispatching system and the MobiRouter journey combination system. Over two thousand taxis in Finland are already controlled using our software. MobiRouter is also the market leader in the United Kingdom for scheduling public Demand Responsive Transport (DRT) services.",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/64299']",
+          "orgName": "Mobisoft Oy",
+          "orgSize": "8",
+          "orgState": "",
+          "orgWebsite": "http://www.mobisoft.fi",
+          "phone": "",
+          "position": "accountant",
+          "seniority": "entry",
+          "state": "Delhi",
+          "ppeIndex": 23,
+          "ppeBatchIndex": 6
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Mumbai",
+          "country": "India",
+          "email": "smirjolkar@vertexsolutions.net",
+          "firstName": "Swapnil",
+          "fullName": "Swapnil Mirjolkar",
+          "functional": "['accounting']",
+          "lastName": "Mirjolkar",
+          "linkedinUrl": "http://www.linkedin.com/in/swapnil-mirjolkar-4b65b723",
+          "orgCity": "San Mateo",
+          "orgCountry": "United States",
+          "orgDescription": "Vertex Solutions helps software companies deliver successful products that meet customer/market needs and are delivered on-time and on-budget.\\\\We enable companies to optimize their end-to-end product development process (from product inception to launch) by leverage our expertise in product management, program management, quality management and business process engineering.",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/510902']",
+          "orgName": "Vertex Solutions",
+          "orgSize": "4",
+          "orgState": "California",
+          "orgWebsite": "http://www.vertexsolutions.net",
+          "phone": "",
+          "position": "ACCOUNTANT",
+          "seniority": "entry",
+          "state": "Maharashtra",
+          "ppeIndex": 24,
+          "ppeBatchIndex": 7
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "New Delhi",
+          "country": "India",
+          "email": "nisha@nationaltime.ca",
+          "firstName": "Nisha",
+          "fullName": "Nisha Arora",
+          "functional": "['accounting']",
+          "lastName": "Arora",
+          "linkedinUrl": "http://www.linkedin.com/in/nisha-arora-6948a242",
+          "orgCity": "Toronto",
+          "orgCountry": "Canada",
+          "orgDescription": "",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/1372216']",
+          "orgName": "National Time Equipment Co. Ltd",
+          "orgSize": "4",
+          "orgState": "Ontario",
+          "orgWebsite": "http://www.nationaltime.ca",
+          "phone": "",
+          "position": "excutive accountant",
+          "seniority": "entry",
+          "state": "Delhi",
+          "ppeIndex": 25,
+          "ppeBatchIndex": 8
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Mumbai",
+          "country": "India",
+          "email": "pankajg@caman.com.au",
+          "firstName": "Pankaj",
+          "fullName": "Pankaj Gharat",
+          "functional": "['accounting']",
+          "lastName": "Gharat",
+          "linkedinUrl": "http://www.linkedin.com/in/pankaj-gharat-b2050a20",
+          "orgCity": "Burswood",
+          "orgCountry": "Australia",
+          "orgDescription": "CA Management Services is a locally owned and operated computer consulting firm specialising in accounting and business software, technology support and Human Resources.\\\\Since 1986, when CA Management Services first commenced operations, there have been many changes to the way organisations do business. But one thing remains the same: \\\\Our independent consultants, pofessional with unqiue accounting, computing and business skills, provide the best objective assistance to businesses. Whether its choosing the right accounting system, getting the best IT hardware, turning your online presence into an integral part of your business or ensuring that your organisation is staffed with the best employees operating under the best HR structures. \\\\Put simply, our independence means that with CA Management Services, you get more business support than you'd expect...",
+          "orgFoundedYear": "1986",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/664964']",
+          "orgName": "CA Management Servies",
+          "orgSize": "9",
+          "orgState": "Western Australia",
+          "orgWebsite": "http://www.caman.com.au",
+          "phone": "",
+          "position": "accountant",
+          "seniority": "entry",
+          "state": "Maharashtra",
+          "ppeIndex": 26,
+          "ppeBatchIndex": 9
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Hyderabad",
+          "country": "India",
+          "email": "swarna@bitmin.net",
+          "firstName": "Swarna",
+          "fullName": "Swarna Bommana",
+          "functional": "['accounting']",
+          "lastName": "Bommana",
+          "linkedinUrl": "http://www.linkedin.com/in/swarna-bommana-7b1074122",
+          "orgCity": "",
+          "orgCountry": "",
+          "orgDescription": "BitMin is a global cloud advisory and technology services company, with unequaled cloud strategy, custom development and integration capabilities. Our team of Software Engineers and Software Architects are experts in multiple technology platforms, be it whether on Google Platform (APP Engine, Cloud, Android) or on Alfresco or bespoke development. \\\\We have worked with Large Enterprises assisting them in their unique needs to Startups who are in their early stage of product conception and helped them taking it forward to present a financially viable development plan leveraging offshore services.",
+          "orgFoundedYear": "2012",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/10396026']",
+          "orgName": "Bitmin Infosystems",
+          "orgSize": "5",
+          "orgState": "",
+          "orgWebsite": "http://www.bitmin.net",
+          "phone": "",
+          "position": "Accountant",
+          "seniority": "entry",
+          "state": "Telangana",
+          "ppeIndex": 27,
+          "ppeBatchIndex": 10
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Warangal",
+          "country": "India",
+          "email": "monica@accountit.com.sg",
+          "firstName": "Monica",
+          "fullName": "Monica Allu",
+          "functional": "",
+          "lastName": "Allu",
+          "linkedinUrl": "http://www.linkedin.com/in/monica-allu-982a72117",
+          "orgCity": "Singapore",
+          "orgCountry": "Singapore",
+          "orgDescription": "",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/1360746']",
+          "orgName": "AccountIT Consultant Pte Ltd",
+          "orgSize": "4",
+          "orgState": "",
+          "orgWebsite": "http://www.accountit.com.sg",
+          "phone": "",
+          "position": "Assistant Accountant",
+          "seniority": "entry",
+          "state": "Telangana",
+          "ppeIndex": 28,
+          "ppeBatchIndex": 11
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Mumbai",
+          "country": "India",
+          "email": "gauri@morpheus.net.in",
+          "firstName": "Gauri",
+          "fullName": "Gauri Dhotre",
+          "functional": "['accounting']",
+          "lastName": "Dhotre",
+          "linkedinUrl": "http://www.linkedin.com/in/gauri-dhotre-70035185",
+          "orgCity": "",
+          "orgCountry": "",
+          "orgDescription": "Morpheus TechSol LLP\\- Headquartered in Mumbai is a leading IT solution provider \\- Researched, Developed and patented an innovated Digital Workspace Solution – Morpho \\- 18 strategic global alliances like HP, Dell, EMC, Fujitsu, Oracle, Emerson, VMWare, CISCO, etc.\\- 180+ man years of corporate experience to handle business critical IT infrastructures\\- Across vertical customer footprint\\- Compliance and best practices oriented consultancy for inception and optimization",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "",
+          "orgName": "Morpheus TechSol LLP",
+          "orgSize": "3",
+          "orgState": "",
+          "orgWebsite": "http://www.morpheus.net.in",
+          "phone": "",
+          "position": "Accountant",
+          "seniority": "entry",
+          "state": "Maharashtra",
+          "ppeIndex": 29,
+          "ppeBatchIndex": 12
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Gurgaon",
+          "country": "India",
+          "email": "romil.mehla@numbertheory.ai",
+          "firstName": "Romil",
+          "fullName": "Romil Mehla",
+          "functional": "['data_science']",
+          "lastName": "Mehla",
+          "linkedinUrl": "http://www.linkedin.com/in/romil-mehla-49674819",
+          "orgCity": "",
+          "orgCountry": "",
+          "orgDescription": "Number Theory is an Artificial Intelligence and Enterprise Data Management firm which helps companies create sustainable competitive advantage by enabling its customer to monetize their data assets and maximize customer Lifetime value.\\\\http://numbertheory.ai",
+          "orgFoundedYear": 2016,
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "",
+          "orgName": "Number Theory",
+          "orgSize": 10,
+          "orgState": "",
+          "orgWebsite": "http://www.numbertheory.ai",
+          "phone": "",
+          "position": "Senior Data Scientist",
+          "seniority": "senior",
+          "state": "Haryana",
+          "ppeIndex": 30,
+          "ppeBatchIndex": 13
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Pune",
+          "country": "India",
+          "email": "kavita@prosysinfotech.com",
+          "firstName": "Kavita",
+          "fullName": "Kavita Madival",
+          "functional": "['data_science']",
+          "lastName": "Madival",
+          "linkedinUrl": "http://www.linkedin.com/in/kavita-madival-897864b4",
+          "orgCity": "Pune",
+          "orgCountry": "India",
+          "orgDescription": "Prosys has been specializing in providing Business Intelligence Solutions to a range of large companies that are mature implementations of ERPs viz. SAP, Oracle Applications, BAAN, MOVEX etc.\\It specializes in identfying requirements (with its range of functional specialists) and developing and implementing the solution (with its range of technology and techno-functional specialists) that are inhouse.\\It is currently practising in offering solutions on the Microsoft Business Intelligence Platform and is a Microsoft Gold partner for Data Analytics competencies.\\It mainly operates from Pune which is based in Maharashtra, India and also has a sales office at Singapore.",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/1302611']",
+          "orgName": "Prosys Infotech Private Limited",
+          "orgSize": 10,
+          "orgState": "Maharashtra",
+          "orgWebsite": "http://www.prosysinfotech.com",
+          "phone": "",
+          "position": "Data Scientist",
+          "seniority": "entry",
+          "state": "Maharashtra",
+          "ppeIndex": 31,
+          "ppeBatchIndex": 14
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "New Delhi",
+          "country": "India",
+          "email": "nisha@nationaltime.ca",
+          "firstName": "Nisha",
+          "fullName": "Nisha Arora",
+          "functional": "['accounting']",
+          "lastName": "Arora",
+          "linkedinUrl": "http://www.linkedin.com/in/nisha-arora-6948a242",
+          "orgCity": "Toronto",
+          "orgCountry": "Canada",
+          "orgDescription": "",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/1372216']",
+          "orgName": "National Time Equipment Co. Ltd",
+          "orgSize": 4,
+          "orgState": "Ontario",
+          "orgWebsite": "http://www.nationaltime.ca",
+          "phone": "",
+          "position": "excutive accountant",
+          "seniority": "entry",
+          "state": "Delhi",
+          "ppeIndex": 32,
+          "ppeBatchIndex": 15
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "city": "Mumbai",
+          "country": "India",
+          "email": "smirjolkar@vertexsolutions.net",
+          "firstName": "Swapnil",
+          "fullName": "Swapnil Mirjolkar",
+          "functional": "['accounting']",
+          "lastName": "Mirjolkar",
+          "linkedinUrl": "http://www.linkedin.com/in/swapnil-mirjolkar-4b65b723",
+          "orgCity": "San Mateo",
+          "orgCountry": "United States",
+          "orgDescription": "Vertex Solutions helps software companies deliver successful products that meet customer/market needs and are delivered on-time and on-budget.\\\\We enable companies to optimize their end-to-end product development process (from product inception to launch) by leverage our expertise in product management, program management, quality management and business process engineering.",
+          "orgFoundedYear": "",
+          "orgIndustry": "['computer software']",
+          "orgLinkedinUrl": "['http://www.linkedin.com/company/510902']",
+          "orgName": "Vertex Solutions",
+          "orgSize": 4,
+          "orgState": "California",
+          "orgWebsite": "http://www.vertexsolutions.net",
+          "phone": "",
+          "position": "ACCOUNTANT",
+          "seniority": "entry",
+          "state": "Maharashtra",
+          "ppeIndex": 33,
+          "ppeBatchIndex": 16
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "create personalized messages": [
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_04183ae46dc542b5006967e09eb3f88193b30c6f10cd041e36",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Smitha, I admire your role as a Jr. Accountant at SYSTECH Softwares, especially how the company supports various software solutions in India. I'd love to connect and learn more about your journey in the accounting field. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_0cdcbf9eb193f866006967e0a147cc8193850ec6566d7f4004",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Kamal, I admire Namtra's commitment to providing high-value IT solutions, especially your role in ensuring financial accuracy as an Accountant. I’d love to connect and learn more about your journey and insights in the industry. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_0f0b352a6e2a0693006967e0a37e6c8193a4cf925454e735f9",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Jagruti, I admire your role as a Sr. Accountant at Rtap.io, especially how your work supports the innovative analytics framework. I'd love to connect and follow your journey in helping organizations maximize their data investments. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_040f14a0426f62ff006967e0a4f7548195b0c912221801e366",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Faith, I admire your role as an Accountant at Agritrace Kenya Ltd, especially your work in enhancing agricultural transparency. I'd love to connect and learn more about your journey and insights in the industry. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_01443a0c49f383cd006967e0a7f7b08193bf3887d12cfa14d2",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Millicent, I admire the way Softlink Options empowers businesses with effective web solutions. Your role as an Accountant must be crucial in supporting those initiatives. I'd love to connect and follow your journey in this dynamic field. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_016b6541753fc5dc006967e0aa019881938d395fb16aa4c776",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Vinod, I admire Cynapse’s commitment to creating innovative technology that enhances everyday life. Your role as an Accountant must be pivotal in supporting such impactful products. I'd love to connect and learn more about your journey. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 5
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_09fffd2fa8fcc0e0006967e0abcc308190b56f6b236f1ce6b5",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Puneet, I admire Mobisoft Oy's commitment to enhancing passenger transport through innovative tech solutions. Your work as an accountant must play a crucial role in supporting those initiatives. I'd love to connect and learn more about your journey! Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 6
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_02f21d6362697450006967e0adb99881959dc40ef29e5178cf",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Swapnil, I admire how Vertex Solutions optimizes product development, ensuring on-time and on-budget delivery. Your role as an accountant plays a crucial part in that success. I'd love to connect and follow your journey. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 7
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_0ec5f96ce7ef0f08006967e0b0e55c8193b4724e088606a4b4",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Nisha, I admire your work as an executive accountant at National Time Equipment Co. Ltd, especially your role in ensuring financial accuracy and supporting the company's mission. I'd love to connect and follow your journey. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 8
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_0ad386291e6550ee006967e0b2973c81948227ef42328f8abc",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Pankaj, I admire CA Management Services' dedication to providing objective assistance in accounting and business software. Your expertise as an accountant must play a vital role in ensuring client success. I'd love to connect and follow your journey. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 9
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_0e40c846533d5fe6006967e0b4730c819395ebd10e1f90d68a",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Swarna, I admire your role as an Accountant at Bitmin Infosystems, especially your contributions to supporting both large enterprises and startups with their financial planning. I'd love to connect and follow your journey in the cloud advisory space! Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 10
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_0eb3c062f63d8098006967e0b620e48197aa1c1c93b4e25812",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Monica, I admire your role as an Assistant Accountant at AccountIT Consultant Pte Ltd, especially how you contribute to innovative financial solutions. I'd love to connect and follow your journey in the accounting field. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 11
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_0f544c90765f2ce6006967e0b7c924819084843bb17f91b7d8",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Gauri, I admire your role as an Accountant at Morpheus TechSol LLP, particularly in supporting innovative IT solutions like Morpho. I'd love to connect and learn more about your experiences and insights in the industry. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 12
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_04a3971d40e6e03a006967e0b98c408190a5ef6e0b6c39b447",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Romil, I admire how Number Theory leverages AI to help companies optimize their data assets for a competitive edge. Your insights as a Senior Data Scientist would be invaluable, and I’d love to connect and follow your journey. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 13
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_05bc685c8ff223de006967e0bd7cb88197903e7eb37a854231",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Kavita, I admire your work as a Data Scientist at Prosys Infotech, especially how you leverage BI solutions to enhance ERP implementations. I'd love to connect and learn more about your journey in the data analytics field. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 14
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_0a96f7c49a643ba7006967e0c012f881948b74e67a55ceb6e6",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Nisha, I admire your role as an executive accountant at National Time Equipment Co. Ltd, especially your contributions to optimizing financial operations. I'd love to connect and follow your journey in the industry. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 15
+        }
+      },
+      {
+        "json": {
+          "output": [
+            {
+              "id": "msg_02ec2e5fd250e1fd006967e0c182c481948773195625b6d037",
+              "type": "message",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "annotations": [],
+                  "logprobs": [],
+                  "text": "Hi Swapnil, I admire how Vertex Solutions optimizes product development, and your role as an accountant is crucial in supporting that efficiency. I'd love to connect and follow your journey in this impactful industry. Cheers!"
+                }
+              ],
+              "role": "assistant"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 16
+        }
+      }
+    ],
+    "Send connection request": [
+      {
+        "json": {
+          "id": "5026256889133077",
+          "createdAt": 1768459563915,
+          "launchedAt": 1768459564348,
+          "status": "running",
+          "launchType": "user api call",
+          "retryNumber": 0
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Add dataset to Sheets": [
+      {
+        "json": {
+          "Full Name": "Smitha Powlay",
+          "Message": "Hi Smitha, I admire your role as a Jr. Accountant at SYSTECH Softwares, especially how the company supports various software solutions in India. I'd love to connect and learn more about your journey in the accounting field. Cheers!"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Kamal Biyabani",
+          "Message": "Hi Kamal, I admire Namtra's commitment to providing high-value IT solutions, especially your role in ensuring financial accuracy as an Accountant. I’d love to connect and learn more about your journey and insights in the industry. Cheers!"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Jagruti Jiman",
+          "Message": "Hi Jagruti, I admire your role as a Sr. Accountant at Rtap.io, especially how your work supports the innovative analytics framework. I'd love to connect and follow your journey in helping organizations maximize their data investments. Cheers!"
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Faith Maritim",
+          "Message": "Hi Faith, I admire your role as an Accountant at Agritrace Kenya Ltd, especially your work in enhancing agricultural transparency. I'd love to connect and learn more about your journey and insights in the industry. Cheers!"
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Millicent Nyando",
+          "Message": "Hi Millicent, I admire the way Softlink Options empowers businesses with effective web solutions. Your role as an Accountant must be crucial in supporting those initiatives. I'd love to connect and follow your journey in this dynamic field. Cheers!"
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Vinod Prajapati",
+          "Message": "Hi Vinod, I admire Cynapse’s commitment to creating innovative technology that enhances everyday life. Your role as an Accountant must be pivotal in supporting such impactful products. I'd love to connect and learn more about your journey. Cheers!"
+        },
+        "pairedItem": {
+          "item": 5
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Puneet Rajput",
+          "Message": "Hi Puneet, I admire Mobisoft Oy's commitment to enhancing passenger transport through innovative tech solutions. Your work as an accountant must play a crucial role in supporting those initiatives. I'd love to connect and learn more about your journey! Cheers!"
+        },
+        "pairedItem": {
+          "item": 6
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Swapnil Mirjolkar",
+          "Message": "Hi Swapnil, I admire how Vertex Solutions optimizes product development, ensuring on-time and on-budget delivery. Your role as an accountant plays a crucial part in that success. I'd love to connect and follow your journey. Cheers!"
+        },
+        "pairedItem": {
+          "item": 7
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Nisha Arora",
+          "Message": "Hi Nisha, I admire your work as an executive accountant at National Time Equipment Co. Ltd, especially your role in ensuring financial accuracy and supporting the company's mission. I'd love to connect and follow your journey. Cheers!"
+        },
+        "pairedItem": {
+          "item": 8
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Pankaj Gharat",
+          "Message": "Hi Pankaj, I admire CA Management Services' dedication to providing objective assistance in accounting and business software. Your expertise as an accountant must play a vital role in ensuring client success. I'd love to connect and follow your journey. Cheers!"
+        },
+        "pairedItem": {
+          "item": 9
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Swarna Bommana",
+          "Message": "Hi Swarna, I admire your role as an Accountant at Bitmin Infosystems, especially your contributions to supporting both large enterprises and startups with their financial planning. I'd love to connect and follow your journey in the cloud advisory space! Cheers!"
+        },
+        "pairedItem": {
+          "item": 10
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Monica Allu",
+          "Message": "Hi Monica, I admire your role as an Assistant Accountant at AccountIT Consultant Pte Ltd, especially how you contribute to innovative financial solutions. I'd love to connect and follow your journey in the accounting field. Cheers!"
+        },
+        "pairedItem": {
+          "item": 11
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Gauri Dhotre",
+          "Message": "Hi Gauri, I admire your role as an Accountant at Morpheus TechSol LLP, particularly in supporting innovative IT solutions like Morpho. I'd love to connect and learn more about your experiences and insights in the industry. Cheers!"
+        },
+        "pairedItem": {
+          "item": 12
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Romil Mehla",
+          "Message": "Hi Romil, I admire how Number Theory leverages AI to help companies optimize their data assets for a competitive edge. Your insights as a Senior Data Scientist would be invaluable, and I’d love to connect and follow your journey. Cheers!"
+        },
+        "pairedItem": {
+          "item": 13
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Kavita Madival",
+          "Message": "Hi Kavita, I admire your work as a Data Scientist at Prosys Infotech, especially how you leverage BI solutions to enhance ERP implementations. I'd love to connect and learn more about your journey in the data analytics field. Cheers!"
+        },
+        "pairedItem": {
+          "item": 14
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Nisha Arora",
+          "Message": "Hi Nisha, I admire your role as an executive accountant at National Time Equipment Co. Ltd, especially your contributions to optimizing financial operations. I'd love to connect and follow your journey in the industry. Cheers!"
+        },
+        "pairedItem": {
+          "item": 15
+        }
+      },
+      {
+        "json": {
+          "Full Name": "Swapnil Mirjolkar",
+          "Message": "Hi Swapnil, I admire how Vertex Solutions optimizes product development, and your role as an accountant is crucial in supporting that efficiency. I'd love to connect and follow your journey in this impactful industry. Cheers!"
+        },
+        "pairedItem": {
+          "item": 16
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "create personalized messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "manual": {
+      "main": [
+        [
+          {
+            "node": "Get Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Leads": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create personalized messages": {
+      "main": [
+        [
+          {
+            "node": "Add dataset to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add dataset to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send connection request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "08e20cfb-ffc4-4e10-9672-7c6024ea17ef",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f44c52069e0a8ae760a68fb17b961c83dc080614ab91d3f795f1ee6de74f52da"
+  },
+  "id": "Kx19f4EzPgvAJ4nO",
+  "tags": []
+}
